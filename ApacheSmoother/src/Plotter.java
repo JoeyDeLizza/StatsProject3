@@ -65,6 +65,46 @@ public class Plotter {
 		}
 		return smoothedPoints;
 	}
+	
+	public double[] betterSmoothYPoints(int windowSize) throws IOException {
+		ArrayList<Double> yCords = this.grabYPointsFromFile();
+		// Stores the yCords in a double array
+		double[] yPoints = new double[yCords.size()];
+		for(int i = 0; i < yPoints.length; i++) {
+			yPoints[i] = yCords.get(i);
+		}
+		// Smooths each point
+		int count = 0;
+		double[] smoothedPoints = new double[yCords.size()];
+		for(int i = 0; i < smoothedPoints.length-1; i++) {
+			int tmpWinSize = windowSize;
+			int rightWindow = windowSize;
+			if(i==0) {
+				smoothedPoints[i] = yPoints[i];
+				continue;
+			}
+			if(i < windowSize) {
+				rightWindow = windowSize - i;
+				windowSize = i;
+				
+			}
+			smoothedPoints[i] = (StatUtils.mean(yPoints, i, rightWindow) + meanLeftOfIndex(yPoints, i-windowSize, windowSize))/2;
+			System.out.println(smoothedPoints[i]);
+			if(i+windowSize > smoothedPoints.length-1) {
+				windowSize--;
+				tmpWinSize=windowSize;
+			}
+			windowSize = tmpWinSize;
+			count++;
+			System.out.println("count"+count);
+		}
+		return smoothedPoints;
+	}
+	
+	private double meanLeftOfIndex(double[] yP, int i, int windowSize) {
+		return StatUtils.mean(yP, i, windowSize);
+	}
+	
 	public void test(int windowSize) throws IOException {
 		 Graph chart = new Graph(
 		         "Salted and Smoothed Graphs" ,
@@ -105,7 +145,7 @@ public class Plotter {
 		dataset.addValue(yCords.get(i), "SaltedPoints", ""+i);
 	}
 	// Add smoothed points to data set
-	double[] smoothYPoints = plot.smoothYPoints(windowSize).clone();
+	double[] smoothYPoints = plot.betterSmoothYPoints(windowSize).clone();
 	for(int i = 0; i < smoothYPoints.length-1; i++) {
 		dataset.addValue(smoothYPoints[i], "SmoothedPoints", ""+i);
 		if(i+windowSize > smoothYPoints.length) {
