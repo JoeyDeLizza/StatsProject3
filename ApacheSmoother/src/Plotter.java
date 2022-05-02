@@ -32,7 +32,6 @@ public class Plotter {
         br = new BufferedReader(fr);
         // read first line in Points
         line = br.readLine();
-        System.out.println(line);
         // Loop to read entire file
         ArrayList<Double> yCords = new ArrayList<>();
         while (line != null) {
@@ -58,7 +57,6 @@ public class Plotter {
 		double[] smoothedPoints = new double[yCords.size()];
 		for(int i = 0; i < smoothedPoints.length-1; i++) {
 			smoothedPoints[i] = StatUtils.mean(yPoints, i, windowSize);
-			System.out.println(smoothedPoints[i]);
 			if(i+windowSize > smoothedPoints.length-1) {
 				windowSize--;
 			}
@@ -74,7 +72,6 @@ public class Plotter {
 			yPoints[i] = yCords.get(i);
 		}
 		// Smooths each point
-		int count = 0;
 		double[] smoothedPoints = new double[yCords.size()];
 		for(int i = 0; i < smoothedPoints.length-1; i++) {
 			int tmpWinSize = windowSize;
@@ -89,14 +86,11 @@ public class Plotter {
 				
 			}
 			smoothedPoints[i] = (StatUtils.mean(yPoints, i, rightWindow) + meanLeftOfIndex(yPoints, i-windowSize, windowSize))/2;
-			System.out.println(smoothedPoints[i]);
 			if(i+windowSize > smoothedPoints.length-1) {
 				windowSize--;
 				tmpWinSize=windowSize;
 			}
 			windowSize = tmpWinSize;
-			count++;
-			System.out.println("count"+count);
 		}
 		return smoothedPoints;
 	}
